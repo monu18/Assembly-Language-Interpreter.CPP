@@ -151,13 +151,12 @@ void Interpreter::runCommandLoop() {
 
     std::string command;
     while (true) {
+            if (halted) {
+                break;
+            }
         std::cout << "Enter command (s: step, a: run all, q: quit): ";
         std::cin >> command;
         if (command == "s") {
-            if (halted) {
-                std::cout << "Program already halted.\n";
-                break;
-            }
             executeNext();
         } else if (command == "a") {
             executeAll();
