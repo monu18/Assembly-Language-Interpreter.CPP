@@ -51,6 +51,6 @@ void Memory::printSymbolTable() const {
     for (const auto& entry : symbolTable) {
         const std::string& symbol = entry.first;
         int address = entry.second;
-        std::cout << "Memory[" << address << "] = " << getData(address) << '\n';
+        std::cout << "Memory[" << address << "] = " << getData(address) << '\n' << '\n';
     }
 }
