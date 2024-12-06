@@ -4,6 +4,8 @@
 #include <sstream>
 #include <stdexcept>
 
+static int MAX_INSTRUCTION_LIMIT = 1000;
+
 // Constructor: Initializes the interpreter state
 Interpreter::Interpreter() : instructionCount(0), halted(false) {}
 
@@ -53,41 +55,56 @@ void Interpreter::loadProgram(const std::string& filename) {
 }
 
 void Interpreter::executeNext() {
+    // Check if halted or PC out of bounds
     if (halted || registers.programCounter >= program.size()) {
-        halted = true;
         printFinalState();
         return;
     }
 
-    // Fetch and execute the current instruction
-    auto* instr = program[registers.programCounter];
+    // Check instruction count threshold for infinite loop prevention
+    if (instructionCount >= MAX_INSTRUCTION_LIMIT) {
+        std::cout << "Execution reached " << instructionCount << " instructions. Continue? (y/n): ";
+        std::string response;
+        std::cin >> response;
+        if (response == "y" || response == "Y") {
+            instructionCount = 0; // Reset instruction count
+        } else {
+            halted = true;
+            std::cout << "Execution halted by user after " << instructionCount << " instructions.\n";
+            printFinalState();
+            return;
+        }
+    }
+
+    // Fetch the current instruction
+    int currentPC = registers.programCounter;
+    auto* instr = program[currentPC];
 
     // Execute the instruction
     instr->execute(memory, registers);
+    ++instructionCount; // Increment instruction count
 
-    // Check if halted after execution
+    // Check if halted (e.g., HLT instruction was executed)
     if (registers.halted) {
         halted = true;
-        printFinalState();
-        return;
     }
 
-    // Increment the program counter unless it's a jump
-    ++registers.programCounter;
-
-    // Print state and memory for after each execution
-    if (!halted && registers.programCounter < program.size()) {
-        std::cout << "PC: " << registers.programCounter
-                  << ", Register A: " << registers.accumulator
-                  << ", Register B: " << registers.dataRegister
-                  << ", Zero Bit: " << registers.zeroBit << '\n';
-
-        std::cout << "Program Memory State: \n";
-        std::cout << "Memory[" << registers.programCounter - 1 << "] = " << instr->getDescription() << '\n';
-
-        std::cout << "Data Memory State: \n";
-        memory.printSymbolTable();
+    // Increment the PC unless the instruction already updated it (e.g., JMP)
+    if (registers.programCounter == currentPC) {
+        ++registers.programCounter;
     }
+
+    // Print state and memory after execution
+    std::cout << "PC: " << registers.programCounter
+              << ", Register A: " << registers.accumulator
+              << ", Register B: " << registers.dataRegister
+              << ", Zero Bit: " << registers.zeroBit << '\n';
+
+    std::cout << "Program Memory State: \n";
+    std::cout << "Memory[" << currentPC << "] = " << instr->getDescription() << '\n';
+
+    std::cout << "Data Memory State: \n";
+    memory.printSymbolTable();
 }
 
 void Interpreter::executeAll() {
