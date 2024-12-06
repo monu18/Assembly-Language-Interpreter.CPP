@@ -51,6 +51,13 @@ void Memory::printSymbolTable() const {
     for (const auto& entry : symbolTable) {
         const std::string& symbol = entry.first;
         int address = entry.second;
-        std::cout << "Memory[" << address << "] = " << getData(address) << '\n' << '\n';
+
+        if (address < 128 || address >= 256) {
+            std::cerr << "Invalid memory address for symbol: " << symbol << '\n';
+            continue;
+        }
+
+        int value = dataMemory[address - 128]; // Adjust address to access data memory
+        std::cout << symbol << " = " << value << '\n';
     }
 }

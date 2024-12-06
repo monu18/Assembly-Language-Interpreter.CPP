@@ -61,36 +61,53 @@ void Interpreter::executeNext() {
 
     // Fetch and execute the current instruction
     auto* instr = program[registers.programCounter];
-    std::cout << "PC: " << registers.programCounter
-              << ", Register A: " << registers.accumulator
-              << ", Register B: " << registers.dataRegister
-              << ", Zero Bit: " << registers.zeroBit << '\n';
 
-    std::cout << "Program Memory State: \n";
-    std::cout << "Memory[" << registers.programCounter << "] = " << instr->getDescription() << '\n';
+    // Print state and memory for step-by-step execution only
+    if (!halted && registers.programCounter < program.size()) {
+        std::cout << "PC: " << registers.programCounter
+                  << ", Register A: " << registers.accumulator
+                  << ", Register B: " << registers.dataRegister
+                  << ", Zero Bit: " << registers.zeroBit << '\n';
 
+        std::cout << "Program Memory State: \n";
+        std::cout << "Memory[" << registers.programCounter << "] = " << instr->getDescription() << '\n';
+
+        std::cout << "Data Memory State: \n";
+        memory.printSymbolTable();
+    }
+
+    // Execute the instruction
     instr->execute(memory, registers);
 
-    // Print Data Memory State after execution
-    std::cout << "Data Memory State: \n";
-    memory.printSymbolTable();
-
-    // Check if the program is halted
+    // Check if halted after execution
     if (registers.halted) {
         halted = true;
         printFinalState();
         return;
     }
 
-    // Increment the program counter unless halted
+    // Increment the program counter unless it's a jump
     ++registers.programCounter;
-    ++instructionCount;
 }
 
 void Interpreter::executeAll() {
-    while (!halted) {
-        executeNext();
+    while (!halted && registers.programCounter < program.size()) {
+        // Suppress intermediate output here by avoiding extra printing in executeNext
+        auto* instr = program[registers.programCounter];
+        instr->execute(memory, registers);
+
+        // Check if halted after execution
+        if (registers.halted) {
+            halted = true;
+            break;
+        }
+
+        // Increment the program counter unless it's a jump
+        ++registers.programCounter;
     }
+
+    // After execution, print the final state
+    printFinalState();
 }
 
 void Interpreter::printFinalState() const {
