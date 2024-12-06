@@ -62,20 +62,6 @@ void Interpreter::executeNext() {
     // Fetch and execute the current instruction
     auto* instr = program[registers.programCounter];
 
-    // Print state and memory for step-by-step execution only
-    if (!halted && registers.programCounter < program.size()) {
-        std::cout << "PC: " << registers.programCounter
-                  << ", Register A: " << registers.accumulator
-                  << ", Register B: " << registers.dataRegister
-                  << ", Zero Bit: " << registers.zeroBit << '\n';
-
-        std::cout << "Program Memory State: \n";
-        std::cout << "Memory[" << registers.programCounter << "] = " << instr->getDescription() << '\n';
-
-        std::cout << "Data Memory State: \n";
-        memory.printSymbolTable();
-    }
-
     // Execute the instruction
     instr->execute(memory, registers);
 
@@ -88,6 +74,20 @@ void Interpreter::executeNext() {
 
     // Increment the program counter unless it's a jump
     ++registers.programCounter;
+
+    // Print state and memory for after each execution
+    if (!halted && registers.programCounter < program.size()) {
+        std::cout << "PC: " << registers.programCounter
+                  << ", Register A: " << registers.accumulator
+                  << ", Register B: " << registers.dataRegister
+                  << ", Zero Bit: " << registers.zeroBit << '\n';
+
+        std::cout << "Program Memory State: \n";
+        std::cout << "Memory[" << registers.programCounter - 1 << "] = " << instr->getDescription() << '\n';
+
+        std::cout << "Data Memory State: \n";
+        memory.printSymbolTable();
+    }
 }
 
 void Interpreter::executeAll() {
