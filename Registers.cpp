@@ -20,6 +20,6 @@ void Registers::printState() const {
     std::cout << "PC: " << programCounter
               << ", Register A: " << accumulator
               << ", Register B: " << dataRegister
-              << ", Zero Bit: " << (zeroBit ? "True" : "False")
+              << ", Zero Bit: " << (zeroBit ? 1 : 0)
               << '\n';
 }

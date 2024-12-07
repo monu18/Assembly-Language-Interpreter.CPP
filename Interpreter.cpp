@@ -94,33 +94,25 @@ void Interpreter::executeNext() {
         ++registers.programCounter;
     }
 
-    // Print state and memory after execution
-    std::cout << "PC: " << registers.programCounter
-              << ", Register A: " << registers.accumulator
-              << ", Register B: " << registers.dataRegister
-              << ", Zero Bit: " << registers.zeroBit << '\n';
+    if (!registers.executeAllFlag) {
+        // std::cout << "PC: " << registers.programCounter
+        //           << ", Register A: " << registers.accumulator
+        //           << ", Register B: " << registers.dataRegister
+        //           << ", Zero Bit: " << registers.zeroBit << '\n';
+        registers.printState();
 
-    std::cout << "Program Memory State: \n";
-    std::cout << "Memory[" << currentPC << "] = " << instr->getDescription() << '\n';
+        std::cout << "Program Memory State: \n";
+        std::cout << "Memory[" << currentPC << "] = " << instr->getDescription() << '\n';
 
-    std::cout << "Data Memory State: \n";
-    memory.printSymbolTable();
+        std::cout << "Data Memory State: \n";
+        memory.printSymbolTable();
+    }
 }
 
 void Interpreter::executeAll() {
+    registers.executeAllFlag = true;
     while (!halted && registers.programCounter < program.size()) {
-        // Suppress intermediate output here by avoiding extra printing in executeNext
-        auto* instr = program[registers.programCounter];
-        instr->execute(memory, registers);
-
-        // Check if halted after execution
-        if (registers.halted) {
-            halted = true;
-            break;
-        }
-
-        // Increment the program counter unless it's a jump
-        ++registers.programCounter;
+        executeNext();
     }
 
     // After execution, print the final state
@@ -129,10 +121,11 @@ void Interpreter::executeAll() {
 
 void Interpreter::printFinalState() const {
     std::cout << "Program halted.\n";
-    std::cout << "PC: " << registers.programCounter
-              << ", Register A: " << registers.accumulator
-              << ", Register B: " << registers.dataRegister
-              << ", Zero Bit: " << registers.zeroBit << '\n';
+    // std::cout << "PC: " << registers.programCounter
+    //           << ", Register A: " << registers.accumulator
+    //           << ", Register B: " << registers.dataRegister
+    //           << ", Zero Bit: " << registers.zeroBit << '\n';
+    registers.printState();
 
     // Print program memory state
     std::cout << "Program Memory State: \n";
