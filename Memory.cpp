@@ -60,4 +60,5 @@ void Memory::printSymbolTable() const {
         int value = dataMemory[address - 128]; // Adjust address to access data memory
         std::cout << symbol << " = " << value << '\n';
     }
+    std::cout << '\n';
 }

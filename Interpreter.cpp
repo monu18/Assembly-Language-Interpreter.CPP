@@ -46,8 +46,6 @@ void Interpreter::loadProgram(const std::string& filename) {
                 throw std::runtime_error("Unknown opcode: " + opcode);
             }
 
-            std::cout << "Loaded instruction: " << opcode << " " << arg << '\n';
-
         } catch (const std::exception& e) {
             std::cerr << "Error processing line: " << line << "\n" << e.what() << '\n';
         }
@@ -95,10 +93,6 @@ void Interpreter::executeNext() {
     }
 
     if (!registers.executeAllFlag) {
-        // std::cout << "PC: " << registers.programCounter
-        //           << ", Register A: " << registers.accumulator
-        //           << ", Register B: " << registers.dataRegister
-        //           << ", Zero Bit: " << registers.zeroBit << '\n';
         registers.printState();
 
         std::cout << "Program Memory State: \n";
@@ -121,10 +115,6 @@ void Interpreter::executeAll() {
 
 void Interpreter::printFinalState() const {
     std::cout << "Program halted.\n";
-    // std::cout << "PC: " << registers.programCounter
-    //           << ", Register A: " << registers.accumulator
-    //           << ", Register B: " << registers.dataRegister
-    //           << ", Zero Bit: " << registers.zeroBit << '\n';
     registers.printState();
 
     // Print program memory state

@@ -131,7 +131,6 @@ std::string JzsInstruction::getDescription() const {
 HltInstruction::HltInstruction() : Instruction("HLT") {}
 
 void HltInstruction::execute(Memory& memory, Registers& registers) {
-    std::cout << "HLT instruction executed. Halting program.\n";
     registers.halted = true;
 }
 
