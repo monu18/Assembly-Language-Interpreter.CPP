@@ -118,13 +118,13 @@ void Interpreter::printFinalState() const {
     registers.printState();
 
     // Print program memory state
-    std::cout << "Program Memory State: \n";
+    std::cout << "\nProgram Memory State: \n";
     for (size_t i = 0; i < program.size(); ++i) {
         std::cout << "Memory[" << i << "] = " << program[i]->getDescription() << '\n';
     }
 
     // Print data memory state
-    std::cout << "Data Memory State: \n";
+    std::cout << "\nData Memory State: \n";
     memory.printSymbolTable();
 }
 
